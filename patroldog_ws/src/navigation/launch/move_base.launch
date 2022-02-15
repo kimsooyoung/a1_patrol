@@ -1,0 +1,31 @@
+<launch>
+  <!-- 设置参数，机器狗控制指令的 topic -->
+  <arg name="cmd_vel_topic" default="cmd_vel" />
+  <!-- 设置参数，机器狗里程计的 topic -->
+  <arg name="odom_topic" default="/localization/odom" />
+  
+  <!-- 启动 move_base 节点，并加载参数，这里的参数决定了运动规划与避障的表现 -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <!-- 设置 运动规划器为 teb_local_planner -->
+    <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+    <!-- 将通用的地图的参数设置赋给全局地图 -->
+    <rosparam file="$(find navigation)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <!-- 将通用的地图的参数设置赋给局部地图 -->
+    <rosparam file="$(find navigation)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <!-- 设置局部地图的参数 -->
+    <rosparam file="$(find navigation)/param/local_costmap_params.yaml" command="load" />
+    <!-- 设置全局地图的参数 -->
+    <rosparam file="$(find navigation)/param/global_costmap_params.yaml" command="load" />
+    <!-- 设置 move_base 的参数 -->
+    <rosparam file="$(find navigation)/param/move_base_params.yaml" command="load" />
+    <!-- 设置 teb_local_planner 的参数 -->
+    <rosparam file="$(find navigation)/param/teb_local_planner_params.yaml" command="load" />
+    <!-- 设置 costmap_converter 的参数 -->
+    <rosparam file="$(find navigation)/param/costmap_converter_params.yaml" command="load" />
+    <!-- 将一些 topic 映射到 另一些 topic -->
+    <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
+    <remap from="odom" to="$(arg odom_topic)"/>
+    <remap from="move_base_simple/goal" to="goal"/>
+  </node>
+
+</launch>

@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="map_path" default="/home/maps/LOAM/cloudSurf.pcd"/>
+
+    <!--- Robot State TF -->
+    <include file="$(find lio_sam)/launch/include/module_robot_state_publisher.launch">
+        <param name="publish_frequency" type="double" value="60.0"/>
+    </include>
+
+    <!-- Publish dog's tf pose during localization-->
+    <node pkg="prm_localization" type="localization_publish_tf.py" name="localization_base_tf"/>
+
+    <!-- tencent localization -->
+    <include file="$(find prm_localization)/launch/tencent_online.launch">
+        <arg name="global_map_pcd_path" value="$(arg map_path)"/>
+    </include>
+</launch>

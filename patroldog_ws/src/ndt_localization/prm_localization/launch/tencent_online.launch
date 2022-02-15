@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<launch>
+    <param name="use_sim_time" type="bool" value="false"/>
+    <!--    "true" to use GPS-->
+    <!--    "false" to set pose maunally-->
+    <arg name="GPS_localization" value="false"/>
+    <!--argument-->
+    <arg name="points_topic" default="/points_raw"/>
+    <arg name="gps_drive_topic" default="/drive"/>
+    <arg name="map_tf" default="map"/>
+    <arg name="base_lidar_tf" default="velodyne"/>
+    <arg name="base_foot_tf" default="base_link"/>
+    <arg name="init_x" default="0"/>
+    <arg name="init_y" default="0"/>
+    <arg name="init_yaw" default="0"/>
+    <arg name="lidar_height" default="0"/>
+    <arg name="trim_low" default="-10"/>
+    <arg name="trim_high" default="40"/>
+    <arg name="radius" default="30.0"/>
+    <arg name="mapUpdateTime" default="5"/>
+    <arg name="global_map_pcd_path" default="/home/unitree/patroldog_ws/src/start/maps/LOAM/day3outdoor2/cloudSurf.pcd"/>
+   
+    <!--regis para-->
+    <arg name="downsample_resolution" default="0.6"/>
+    <arg name="TransformationEpsilon" default="0.01"/>
+    <!--ndt-->
+    <arg name="ndt_resolution" default="1"/>
+    <arg name="regis_hard_threshold" default="30"/>
+    <!--filter-->
+    <arg name="farPointThreshold" default="50"/>
+    <arg name="nearPointThreshold" default="1.3"/>
+    <arg name="manager_name" default="localization_manager"/>
+
+    <arg name="flag_slam_insout" default="true"/>
+    <arg name="lp_odom_rate" default="0"/>
+
+
+
+    <!--manager-->
+    <node pkg="nodelet" type="nodelet" name="$(arg manager_name)" args="manager"/>
+    <!--nodelet-->
+    <!-- same meaning param filed in two nodes must have same values-->
+    <node pkg="nodelet" type="nodelet" name="rt_localization_nodelet"
+          args="load prm_localization/RealTime_Localization $(arg manager_name)">
+        <remap from="/velodyne_points" to="$(arg points_topic)"/>
+        <param name="GPS_localization" value="$(arg GPS_localization)"/>
+        <param name="ndt_resolution" value="$(arg ndt_resolution)"/>
+        <param name="regis_hard_threshold" value="$(arg regis_hard_threshold)"/>
+        <param name="lidar_height" value="$(arg lidar_height)"/>
+        <param name="lp_odom_rate" value="$(arg lp_odom_rate)"/>
+        <param name="farPointThreshold" value="$(arg farPointThreshold)"/>
+        <param name="lidar_height" value="$(arg lidar_height)"/>
+        <param name="nearPointThreshold" value="$(arg nearPointThreshold)"/>
+        <param name="trim_low" value="$(arg trim_low)"/>
+        <param name="trim_high" value="$(arg trim_high)"/>
+        <param name="init_x" value="$(arg init_x)"/>
+        <param name="init_y" value="$(arg init_y)"/>
+        <param name="init_yaw" value="$(arg init_yaw)"/>
+        <param name="TransformationEpsilon" value="$(arg TransformationEpsilon)"/>
+        <param name="map_tf" value="$(arg map_tf)"/>
+        <param name="base_lidar_tf" value="$(arg base_lidar_tf)"/>
+        <param name="base_foot_tf" value="$(arg base_foot_tf)"/>
+        <param name="downSampleSize" value="$(arg downsample_resolution)"/>
+        <param name="flag_slam_insout" value="$(arg flag_slam_insout)"/>
+    </node>
+    <node pkg="nodelet" type="nodelet" name="globalmap_provider_nodelet"
+          args="load prm_localization/GlobalmapProviderNodelet $(arg manager_name)">
+        <param name="lidar_height" value="$(arg lidar_height)"/>
+        <param name="trim_high" value="$(arg trim_high)"/>
+        <param name="trim_low" value="$(arg trim_low)"/>
+        <param name="downsample_resolution" value="$(arg downsample_resolution)"/>
+        <param name="map_tf" value="$(arg map_tf)"/>
+        <param name="base_lidar_tf" value="$(arg base_lidar_tf)"/>
+        <!--         <param name="init_x" value="$(arg init_x)" /> -->
+        <!--         <param name="init_y" value="$(arg init_y)" /> -->
+        <!--         <param name="init_yaw" value="$(arg init_yaw)" /> -->
+        <param name="radius" value="$(arg radius)"/>
+        <param name="mapUpdateTime" value="$(arg mapUpdateTime)"/>
+        <param name="global_map_pcd_path" value="$(arg global_map_pcd_path)"/>
+    </node>
+
+</launch>

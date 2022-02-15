@@ -1,0 +1,43 @@
+<launch>
+    <!-- 启动建图任务的文件 -->
+
+    <!-- 设置参数，地图的名字 -->
+    <arg name="map_name" default="map_test"/>
+
+    <!-- 启动激光雷达驱动 -->
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
+    <!-- 启动 3D SLAM 建图算法 lio-sam -->
+    <include file="$(find lio_sam)/launch/run.launch">
+        <arg name="map_save_path" value="$(find start)/maps/LOAM/$(arg map_name)/"/>
+    </include>
+
+    <!-- 发布 base_link 到 base_footprint 的坐标变换 -->
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 0 0 0 /base_link /base_footprint 100"/>
+
+    <!-- 发布 global_map 到 local_map 的坐标变换 -->
+    <node pkg="start" type="local_map_tf_publisher" name="local_map_tf_publisher"/>
+
+    <!-- 启动 2D SLAM 算法 gmapping -->
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping_node" output="screen">
+        <param name="map_frame" value="map"/>
+        <param name="base_frame" value="base_link"/>
+        <param name="delta" value="0.1"/>
+        <param name="map_file_path" value="$(find start)/maps/gmapping/$(arg map_name)"/>
+    </node>
+    <!-- 发布 map 到 local_map 的坐标变换 -->
+    <!-- <node pkg="start" type="local_map_tf_publisher" name="local_map_tf_publisher_node" output="screen"/> -->
+
+    <!-- 启动路径规划和避障的算法 -->
+    <include file="$(find navigation)/launch/move_base.launch">
+        <arg name="odom_topic" value="/lio_sam/mapping/odom"/>
+    </include>
+    
+    <!-- 启动与机器狗的通讯 -->
+    <include file="$(find unitree_legged_real)/launch/real.launch"/>
+    <!-- 与机器狗沟通的 ROS 界面 -->
+    <node pkg="unitree_legged_real" type="ros_control" name="dog_control_node" output="screen">
+        <param name="is_build_map" value="true"/>
+        <param name="patrol_points_file" value="$(find start)/maps/gmapping/$(arg map_name)_patrol_points.txt"/>
+    </node>
+
+</launch>

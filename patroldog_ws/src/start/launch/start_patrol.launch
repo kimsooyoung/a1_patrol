@@ -1,0 +1,41 @@
+<launch>
+    <!-- 启动巡逻的任务 -->
+
+    <!-- 设置参数，地图的名字，默认为 “map_test” -->
+    <arg name="map_name" default="map_test"/>
+    
+    <!-- 启动激光雷达驱动 -->
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
+    <!-- 启动 3D 点云匹配算法，用于定位 -->
+    <include file="$(find prm_localization)/launch/start_online_localization.launch">
+        <arg name="map_path" value="$(find start)/maps/LOAM/$(arg map_name)/cloudSurf.pcd"/>
+    </include>
+
+    <!-- 发布 base_link 到 base_footprint 的坐标变换 -->
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 0 0 0 /base_link /base_footprint 100"/>
+    <!-- 发布 map 到 odom 的坐标变换 -->
+    <node pkg="tf" type="static_transform_publisher" name="map_odom_broadcaster" args="0 0 0 0 0 0 /map /odom 100"/>
+
+    <!-- 发布 global_map 到 local_map 的坐标变换 -->
+    <node pkg="start" type="local_map_tf_publisher" name="local_map_tf_publisher"/>
+
+    <!-- 启动导航路径规划，避障的算法 -->
+    <include file="$(find navigation)/launch/navigation.launch">
+        <arg name="map_file" value="$(find start)/maps/gmapping/$(arg map_name).yaml"/>
+        <arg name="odom_topic" value="/localization/odom"/>
+    </include>
+    
+    <!-- 启动与机器狗的沟通 -->
+    <include file="$(find unitree_legged_real)/launch/real.launch"/>
+    <!-- 与机器狗沟通的 ROS 界面 -->
+    <node pkg="unitree_legged_real" type="ros_control" name="dog_control_node" output="screen">
+        <param name="is_build_map" value="false"/>
+        <param name="patrol_points_file" value="$(find start)/maps/gmapping/$(arg map_name)_patrol_points.txt"/>
+    </node>
+
+    <!-- 启动巡逻点的发布程序 -->
+    <node pkg="start" type="patrol" name="send_patrol_points" output="screen">
+        <param name="patrol_points_file" value="$(find start)/maps/gmapping/$(arg map_name)_patrol_points.txt"/>
+    </node>
+
+</launch>

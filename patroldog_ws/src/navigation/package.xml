@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>navigation</name>
+  <version>1.0.0</version>
+  <description>The navigation package</description>
+
+  <author>CLEAR LAB</author>
+  <maintainer email="1020511665@qq.com">CLEAR LAB</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>map_server</exec_depend>
+  <exec_depend>move_base</exec_depend>
+
+</package>

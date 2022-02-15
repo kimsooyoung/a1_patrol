@@ -1,0 +1,16 @@
+<launch>
+  <!-- 设置参数，2D 地图的路径 -->
+  <arg name="map_file" default="/home/maps/gmapping/map_test.yaml"/>
+  <!-- 设置参数，机器狗里程计的 topic -->
+  <arg name="odom_topic" default="/localization/odom"/>
+
+  <!-- 加载 map 文件，并发布 地图 topic -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <!-- 启动 move_base 节点 -->
+  <include file="$(find navigation)/launch/move_base.launch">
+    <arg name="odom_topic" value="$(arg odom_topic)"/>
+  </include>
+
+</launch>
+  
