@@ -24,7 +24,7 @@ Added by Syx, control dog with ros
 #include <sensor_msgs/Imu.h>
 #include "convert.h"
 
-// 设置一些参数
+// 매개변수 설정
 float linear_x = 0.0;
 float linear_y = 0.0;
 float angular_z = 0.0;
@@ -33,24 +33,24 @@ bool can_move = false;
 bool is_build_map = false;
 float yaw = 0;
 
-// 创建狗 imu 的数据
+// 개 imu의 데이터를 만듭니다.
 // dog's imu message to publish
 sensor_msgs::Imu dogImu;
 std_msgs::Bool dog_can_move;
 
-// 从 ros 读取运动指令的回调函数
+// ros에서 움직임 명령어를 읽어오는 callback 함수
 void cmd_vel_cb(const geometry_msgs::Twist& msg){
     linear_x = msg.linear.x;
     linear_y = msg.linear.y;
     angular_z = msg.angular.z;
 }
 
-// 从 ros 读取运动指令的回调函数
+// ros에서 움직임 명령어를 읽어오는 callback 함수
 void mode_cb(const std_msgs::UInt8& msg){
     mode = msg.data;
 }
 
-// 一个 LCM 的模板
+// LCM template
 template<typename TLCM>
 void* update_loop(void* param)
 {
@@ -61,7 +61,7 @@ void* update_loop(void* param)
     }
 }
 
-// main 函数的模板
+// main 함수 template
 template<typename TCmd, typename TState, typename TLCM>
 int mainHelper(int argc, char *argv[], TLCM &roslcm)
 {
@@ -70,27 +70,27 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
               << "Press Enter to continue..." << std::endl;
     // std::cin.ignore();
     
-    // 获取 ros 的参数
+    // ros 매개변수 가져오기
     ros::param::get("dog_control_node/is_build_map", is_build_map);
-    // 设置参数 巡逻点文件 的默认值
+    // 인자순찰점 파일의 기본값 설정
     std::string patrol_points_file_path = "";
-    // 判断是否是建图的任务，否则就不需要保存巡逻点
+    // 설계도 작업인지 아닌지를 판단해야 하며, 그렇지 않으면 순찰점을 보존할 필요가 없다.
     if (is_build_map) {
         ros::param::get("dog_control_node/patrol_points_file", patrol_points_file_path);
     }
-    // 读取巡逻点文件
+    // 순찰점 파일을 읽다.
     std::ofstream patrol_points_file(patrol_points_file_path, std::ios::trunc);
     int last_start_cmd = 0;
     int last_set_cmd = 0;
     float last_point[3] = {0};
     bool is_same_point = false;
 
-    // 创建一些坐标变换的变量
+    // 좌표 변환 변수 만들기
     tf2_ros::Buffer tfBuffer;
     tf2_ros::TransformListener tfListener(tfBuffer);
     geometry_msgs::TransformStamped transformStamped;
 
-    // ros 句柄与参数设置
+    // ros 구문 자루와 인자 설정
     ros::NodeHandle n;
     ros::Rate loop_rate(500);
 
@@ -110,7 +110,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     // roslcm 的初始化
     roslcm.SubscribeState();
 
-    // 开启一个新的线程
+    // 새 스레드 열기
     pthread_t tid;
     pthread_create(&tid, NULL, update_loop<TLCM>, &roslcm);
 
@@ -124,7 +124,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
         // for(int i=0; i < 40; i++) {
         //     std::cout << i << "  RECV: " << int(RecvHighROS.wirelessRemote[i]) << std::endl;
         // }
-        // 通过 遥控器的 start 键控制狗是否能动
+        // 리모컨의 start 키를 통해 개의 능동 여부를 제어합니다.
         if (RecvHighROS.wirelessRemote[2]-last_start_cmd==4) {
             can_move = !can_move;
             if (can_move) {
@@ -159,12 +159,12 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
         // publish dog's imu message
         // 发布狗的 imu 信息到 ros 中，供别的节点使用
         dog_imu_pub.publish(dogImu);
-        // 如果是建图过程，则执行保存巡逻点的程序
+        // 만약 렌더링 과정이라면, 순찰점을 저장하는 프로그램을 수행합니다.
         if (is_build_map) {
             // std::cout << bodyHeight << "RECV: " << RecvHighROS.bodyHeight << std::endl;
-            // 如果检测到 遥控器 X 键的相应变化则进入保存点的程序
+            // 리모컨 X키의 해당 변화가 감지되면 저장소에 들어가는 프로그램
             if (RecvHighROS.wirelessRemote[3]-last_set_cmd==4) {
-                // 判断巡逻点文件是否打开
+                // 순찰점 파일 열림 여부 판단
                 if (patrol_points_file.is_open()) {
                     try {
                         transformStamped = tfBuffer.lookupTransform("map", "base_link",
@@ -175,9 +175,10 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
                         ros::Duration(1.0).sleep();
                         continue;
                     }
-                    // 获取狗当前 yaw 的信息
+                    // 개의 현재 yaw 정보 가져오기
                     yaw = tf2::getYaw(transformStamped.transform.rotation);
-                    // 如果保存的点和上一个巡逻点的距离太近则不保存新的点（x y 小于 3cm 且角度 yaw 小于 0.09 弧度）
+                    // 보존된 지점과 이전 초계점의 거리가 너무 가까울 경우.
+                    // 새로운 점(x y 3cm 이하, 각도 yaw 0.09호 이하)은 보존되지 않습니다.
                     if (transformStamped.transform.translation.x-last_point[0]<=0.03) {
                         if (transformStamped.transform.translation.y-last_point[1]<=0.03) {
                             if (yaw-last_point[2]<=0.09) {
@@ -185,7 +186,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
                             }
                         }
                     }
-                    // 如果是同一个点则不保存，否则就保存
+                    // 같은 점이라면 저장하지 않습니다. 그렇지 않으면 저장합니다.
                     if (is_same_point) {
                         std::cout << "Same points, not saved !!!!!!!!!!!!!!!!!!" << std::endl;
                     } else {
@@ -208,20 +209,20 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
                         last_point[1] = transformStamped.transform.translation.y;
                         last_point[2] = yaw;
                     }
-                    // 将判断归位 方便下一次判断
+                    // 판단을 귀순시켜 다음 판단을 용이하게 하다.
                     is_same_point=false;
                 }
             }
         }
-        // 保存上一次的键值，以便判断遥控器状态
+        // 리모컨 상태를 판단하기 위해 이전 키 값을 저장합니다.
         last_set_cmd = RecvHighROS.wirelessRemote[3];
-        // 如果遥控器表示机器狗可以运动，则发布狗相应的运动状态
+        // 만약 리모컨이 로봇 개가 운동할 수 있음을 나타낸다면, 개의 운동 상태를 알린다.
         if (can_move) {
             SendHighROS.mode = mode;
         } else {
             SendHighROS.mode = 1;
         }
-        // 设置狗的运动信息
+        // 개의 운동 정보 설정
         SendHighROS.forwardSpeed = linear_x;
         SendHighROS.sideSpeed = linear_y;
         SendHighROS.rotateSpeed = angular_z;
@@ -229,28 +230,28 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
         SendHighROS.pitch = 0;
         SendHighROS.yaw = 0;
 
-        // 编码 ros 的运动信息到 底层需要的 格式
+        // ros의 움직임 정보를 하위 단계까지 인코딩하는 데 필요한 형식
         SendHighLCM = ToLcm(SendHighROS, SendHighLCM);
         roslcm.Send(SendHighLCM);
-        // ros 进入回调函数
+        // ros 리플레이 함수 진입
         ros::spinOnce();
-        // 以一定的时间暂停，以达到设置的循环频率
+        // 설정된 순환 빈도에 도달하기 위해 일정한 시간으로 일시 정지한다.
         loop_rate.sleep(); 
     }
-    // 关闭巡逻点文件
+    // 순찰점 문건을 폐쇄하다.
     patrol_points_file.close();
 
     return 0;
 }
 
 int main(int argc, char *argv[]){
-    // ros 初始化
+    // ros 초기화
     ros::init(argc, argv, "dog_control_node");
-    // 设置 机器狗通信的固件版本
+    // 로봇 개 통신의 펌웨어 버전을 설정하다.
     std::string firmwork;
     ros::param::get("/firmwork", firmwork);
 
-    // 使用 3_2 或者 3_1
+    // 3__2 또는 3_1 사용
     if(firmwork == "3_2"){
         std::string robot_name;
         UNITREE_LEGGED_SDK::LeggedType rname;
