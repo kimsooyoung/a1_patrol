@@ -19,3 +19,10 @@ CI builds are currently run for Kinetic and Melodic.
 - <sup>1</sup>Velodyne: http://www.ros.org/wiki/velodyne
 - <sup>2</sup>ROS: http://www.ros.org
 - <sup>3</sup>`Velodyne high definition 3D LIDARs`: http://www.velodynelidar.com/lidar/lidar.aspx
+
+cop velodyne && sds
+cop velodyne_driver && sds
+cop velodyne_laserscan && sds
+cop velodyne_msgs && sds
+cop velodyne_pcl && sds
+cop velodyne_pointcloud && sds
