@@ -223,9 +223,9 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
             SendHighROS.mode = 1;
         }
         // 개의 운동 정보 설정
-        SendHighROS.forwardSpeed = linear_x;
-        SendHighROS.sideSpeed = linear_y;
-        SendHighROS.rotateSpeed = angular_z;
+        SendHighROS.velocity[0] = linear_x;
+        SendHighROS.velocity[1] = linear_y;
+        SendHighROS.yawSpeed    = angular_z;
         SendHighROS.roll  = 0;
         SendHighROS.pitch = 0;
         SendHighROS.yaw = 0;
