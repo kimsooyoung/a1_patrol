@@ -32,11 +32,7 @@
     </include>
     
     <!-- 로봇 개와의 통신 시작 -->
-    <include file="$(find unitree_legged_real)/launch/real.launch"/>
+    <node pkg="unitree_legged_real" type="lcm_server_3_2" name="lcm_server_3_2"/>
     <!-- 로봇개와의 소통 ROS 인터페이스 -->
-    <node pkg="unitree_legged_real" type="ros_control" name="dog_control_node" output="screen">
-        <param name="is_build_map" value="true"/>
-        <param name="patrol_points_file" value="$(find start)/maps/gmapping/$(arg map_name)_patrol_points.txt"/>
-    </node>
-
+    <node pkg="unitree_legged_real" type="ros_control" name="ros_control"/>
 </launch>

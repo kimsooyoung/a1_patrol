@@ -226,9 +226,9 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
         SendHighROS.velocity[0] = linear_x;
         SendHighROS.velocity[1] = linear_y;
         SendHighROS.yawSpeed    = angular_z;
-        SendHighROS.roll  = 0;
-        SendHighROS.pitch = 0;
-        SendHighROS.yaw = 0;
+        SendHighROS.euler[0]  = 0;
+        SendHighROS.euler[1]  = 0;
+        SendHighROS.euler[2]  = 0;
 
         // ros의 움직임 정보를 하위 단계까지 인코딩하는 데 필요한 형식
         SendHighLCM = ToLcm(SendHighROS, SendHighLCM);

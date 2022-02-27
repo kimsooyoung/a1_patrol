@@ -46,11 +46,11 @@ set(EXTRA_LIBS ${LEGGED_SDK_NAME} lcm)
 
 set(CMAKE_CXX_FLAGS "-O3")
 
-add_executable(ros_control src/exe/ros_control.cpp)
+add_executable(ros_control src/exe/ros_control_a1.cpp)
 target_link_libraries(ros_control ${EXTRA_LIBS} ${catkin_LIBRARIES})
 add_dependencies(ros_control ${${PEOJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-add_executable(lcm_server_3_2 /home/unitree/Downloads/unitree_legged_sdk/examples/lcm_server.cpp)
+add_executable(lcm_server_3_2 /home/unitree/Downloads/unitree_legged_sdk/examples/lcm_server_high.cpp)
 target_link_libraries(lcm_server_3_2 ${EXTRA_LIBS} ${catkin_LIBRARIES})
 add_dependencies(lcm_server_3_2 ${${PEOJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
