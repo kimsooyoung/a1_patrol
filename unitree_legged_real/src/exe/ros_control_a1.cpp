@@ -79,10 +79,10 @@ void *update_loop(void *param)
 template <typename TCmd, typename TState, typename TLCM>
 int mainHelper(int argc, char *argv[], TLCM &roslcm)
 {
-  std::cout << "WARNING: Control level is set to HIGH-level." << std::endl
-            << "Make sure the robot is standing on the ground." << std::endl
-            << "Press Enter to continue..." << std::endl;
-  std::cin.ignore();
+  // std::cout << "WARNING: Control level is set to HIGH-level." << std::endl
+  //           << "Make sure the robot is standing on the ground." << std::endl
+  //           << "Press Enter to continue..." << std::endl;
+  // std::cin.ignore();
 
   int last_start_cmd = 0;
   int last_set_cmd = 0;
@@ -99,11 +99,12 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
   ros::Publisher dog_can_move_pub = n.advertise<std_msgs::Bool>("/dog_can_move", 1000);
   ros::Publisher dog_odom_pub = n.advertise<nav_msgs::Odometry>("/dog_odom", 1000);
   tf::TransformBroadcaster broadcaster_;
+  tf::TransformBroadcaster odom_broadcaster_;
 
   TCmd SendHighLCM = {0};
   TState RecvHighLCM = {0};
   tf::Quaternion imu_tf_orientation;
-  tf::Transform transform;
+  tf::Transform imu_transform;
   tf::Transform odom_transform;
   unitree_legged_msgs::HighCmd SendHighROS;
   unitree_legged_msgs::HighState RecvHighROS;
@@ -138,10 +139,11 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     dogImu.header.frame_id = "imu_link";
     dogImu.header.stamp = ros::Time::now();
     // dog's orientation 개의 방향 정보
-    dogImu.orientation.w = RecvHighROS.imu.quaternion[0];
-    dogImu.orientation.x = -RecvHighROS.imu.quaternion[1];
-    dogImu.orientation.y = -RecvHighROS.imu.quaternion[2];
-    dogImu.orientation.z = -RecvHighROS.imu.quaternion[3];
+    dogImu.orientation.x = RecvHighROS.imu.quaternion[0];
+    dogImu.orientation.y = RecvHighROS.imu.quaternion[1];
+    dogImu.orientation.z = RecvHighROS.imu.quaternion[2];
+    dogImu.orientation.w = RecvHighROS.imu.quaternion[3];
+
     // dogImu.orientation_covariance[0] = -1;
     // dog's angular_velocity 개의 각속도 정보
     dogImu.angular_velocity.x = RecvHighROS.imu.gyroscope[0];
@@ -157,16 +159,22 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     // new_orientation = q * new_orientation;
 
     // TODO : Check whether xyzw or wxyz
-    imu_tf_orientation[0] = dogImu.orientation.x;
-    imu_tf_orientation[1] = dogImu.orientation.y;
-    imu_tf_orientation[2] = dogImu.orientation.z;
-    imu_tf_orientation[3] = dogImu.orientation.w;
+    imu_tf_orientation[0] = -RecvHighROS.imu.quaternion[0];
+    imu_tf_orientation[1] = -RecvHighROS.imu.quaternion[1];
+    imu_tf_orientation[2] = -RecvHighROS.imu.quaternion[2];
+    imu_tf_orientation[3] = RecvHighROS.imu.quaternion[3];
 
     tf::Matrix3x3 m(imu_tf_orientation);
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
 
     // std::cout << roll << " " << pitch << " " << yaw;
+
+    if(false){
+      std::cout << dogImu.linear_acceleration.x << " " 
+        << dogImu.linear_acceleration.y << " " 
+        << dogImu.linear_acceleration.z << std::endl;
+    }
 
     imu_transform.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
     imu_transform.setRotation(imu_tf_orientation);
@@ -192,8 +200,8 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
 
     odom_transform.setOrigin(tf::Vector3(dogOdom.pose.pose.position.x, dogOdom.pose.pose.position.y, 0.0));
     odom_transform.setRotation(imu_tf_orientation);
-    broadcaster_.sendTransform(tf::StampedTransform(
-        odom_transform, ros::Time::now(), "a1_odom", "base_link"));
+    // odom_broadcaster_.sendTransform(tf::StampedTransform(
+    //     odom_transform, ros::Time::now(), "a1_odom", "base_link"));
 
     // 리모컨 상태를 판단하기 위해 이전 키 값을 저장합니다.
     last_set_cmd = RecvHighROS.wirelessRemote[3];
@@ -216,7 +224,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
       SendHighROS.velocity[0] = 0.0;
       SendHighROS.velocity[1] = 0.0;
       SendHighROS.yawSpeed = angular_z;
-      SendHighROS.euler[0] = linear_y * 0.7;
+      SendHighROS.euler[0] = linear_y * -0.7;
       SendHighROS.euler[1] = linear_x * 0.5;
       SendHighROS.euler[2] = angular_z * 0.3;
       break;
