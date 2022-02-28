@@ -1,0 +1,15 @@
+<launch>
+    <arg name="map_name" default="map_test"/>
+
+    <!-- 로봇 개와의 통신 시작 -->
+    <node pkg="unitree_legged_real" type="lcm_server_3_2" name="lcm_server_3_2"/>
+    <!-- 로봇개와의 소통 ROS 인터페이스 -->
+    <node pkg="unitree_legged_real" type="ros_control" name="ros_control"/>
+
+    <!-- 위고 메뉴얼과 동일 -->
+    <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
+    <!-- 3D SLAM lio-sam -->
+    <include file="$(find lio_sam)/launch/run.launch">
+        <arg name="map_save_path" value="$(find start)/maps/LOAM/$(arg map_name)/"/>
+    </include>
+</launch>
