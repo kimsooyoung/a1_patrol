@@ -161,10 +161,18 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     tf_orientation[2] = dogImu.orientation.z;
     tf_orientation[3] = dogImu.orientation.w;
 
+    tf::Matrix3x3 m(tf_orientation);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+
+    std::cout << roll << " " << pitch << " " << yaw;
+
     transform.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
     transform.setRotation(tf_orientation);
     broadcaster_.sendTransform(tf::StampedTransform(
         transform, ros::Time::now(), "imu_link", "base_link"));
+
+
 
     // Prepare Odom MSG
     dogOdom.header.frame_id = "odom";
