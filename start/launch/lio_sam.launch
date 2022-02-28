@@ -1,0 +1,9 @@
+
+<launch>
+    <arg name="map_name" default="hanyang_startup"/>
+
+    <!-- 3D SLAM lio-sam -->
+    <include file="$(find lio_sam)/launch/run.launch">
+        <arg name="map_save_path" value="$(find start)/maps/LOAM/$(arg map_name)/"/>
+    </include>
+</launch>
