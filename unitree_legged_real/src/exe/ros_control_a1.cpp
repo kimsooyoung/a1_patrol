@@ -26,6 +26,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 uint8_t mode = 1;
 uint8_t a1_mode = 1;
 
+float body_height = 0.05;
 float linear_x = 0.0;
 float linear_y = 0.0;
 float angular_z = 0.0;
@@ -39,6 +40,7 @@ sensor_msgs::Imu dogImu;
 nav_msgs::Odometry dogOdom;
 std_msgs::Bool dog_can_move;
 
+
 void cmd_vel_cb(const geometry_msgs::Twist &msg)
 {
   linear_x = msg.linear.x;
@@ -48,6 +50,14 @@ void cmd_vel_cb(const geometry_msgs::Twist &msg)
   std::cout << linear_x << "," << linear_y << "," << angular_z << std::endl;
 }
 
+void body_height_cb(const std_msgs::UInt8 &msg)
+{
+  body_height = int(msg.data) * 0.01;
+
+  std::cout << body_height << std::endl;
+  std::cout << "flag" << std::endl;
+}
+
 void mode_cb(const std_msgs::UInt8 &msg)
 {
   mode = msg.data;
@@ -55,6 +65,7 @@ void mode_cb(const std_msgs::UInt8 &msg)
   std::cout << int(mode) << std::endl;
   std::cout << "flag" << std::endl;
 }
+
 
 void a1_mode_cb(const std_msgs::UInt8 &msg)
 {
@@ -95,6 +106,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
   ros::Subscriber cmd_vel_sub = n.subscribe("/cmd_vel", 1, cmd_vel_cb);
   ros::Subscriber mode_sub = n.subscribe("/dog_mode", 1, mode_cb);
   ros::Subscriber a1_mode_sub = n.subscribe("/a1_mode", 1, a1_mode_cb);
+  ros::Subscriber body_height_sub = n.subscribe("/a1_body_height", 1, body_height_cb);
   ros::Publisher dog_imu_pub = n.advertise<sensor_msgs::Imu>("/imu_raw", 1000);
   ros::Publisher dog_can_move_pub = n.advertise<std_msgs::Bool>("/dog_can_move", 1000);
   ros::Publisher dog_odom_pub = n.advertise<nav_msgs::Odometry>("/dog_odom", 1000);
@@ -137,10 +149,28 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     dogImu.header.frame_id = "imu_link";
     dogImu.header.stamp = ros::Time::now();
     // dog's orientation 개의 방향 정보
-    dogImu.orientation.w = RecvHighROS.imu.quaternion[0];
-    dogImu.orientation.x = -RecvHighROS.imu.quaternion[1];
-    dogImu.orientation.y = -RecvHighROS.imu.quaternion[2];
-    dogImu.orientation.z = -RecvHighROS.imu.quaternion[3];
+    // dogImu.orientation.w = RecvHighROS.imu.quaternion[0];
+    // dogImu.orientation.x = -RecvHighROS.imu.quaternion[1];
+    // dogImu.orientation.y = -RecvHighROS.imu.quaternion[2];
+    // dogImu.orientation.z = -RecvHighROS.imu.quaternion[3];
+
+    dogImu.orientation.x = RecvHighROS.imu.quaternion[0];
+    dogImu.orientation.y = RecvHighROS.imu.quaternion[1];
+    dogImu.orientation.z = RecvHighROS.imu.quaternion[2];
+    dogImu.orientation.w = RecvHighROS.imu.quaternion[3];
+
+    if(false){
+      tf_orientation[0] = dogImu.orientation.x;
+      tf_orientation[1] = dogImu.orientation.y;
+      tf_orientation[2] = dogImu.orientation.z;
+      tf_orientation[3] = dogImu.orientation.w;
+    }
+
+    tf::Matrix3x3 m(tf_orientation);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+    std::cout << roll << " " << pitch << " " << yaw << std::endl;
+
     // dogImu.orientation_covariance[0] = -1;
     // dog's angular_velocity 개의 각속도 정보
     dogImu.angular_velocity.x = RecvHighROS.imu.gyroscope[0];
@@ -156,23 +186,21 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     // new_orientation = q * new_orientation;
 
     // TODO : Check whether xyzw or wxyz
-    tf_orientation[0] = dogImu.orientation.x;
-    tf_orientation[1] = dogImu.orientation.y;
-    tf_orientation[2] = dogImu.orientation.z;
-    tf_orientation[3] = dogImu.orientation.w;
+    tf_orientation[0] = -RecvHighROS.imu.quaternion[0];
+    tf_orientation[1] = -RecvHighROS.imu.quaternion[1];
+    tf_orientation[2] = -RecvHighROS.imu.quaternion[2];
+    tf_orientation[3] = RecvHighROS.imu.quaternion[3];
 
-    tf::Matrix3x3 m(tf_orientation);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-
-    std::cout << roll << " " << pitch << " " << yaw;
+    if(false){
+      std::cout << dogImu.linear_acceleration.x << " " 
+        << dogImu.linear_acceleration.y << " " 
+        << dogImu.linear_acceleration.z << std::endl;
+    }
 
     transform.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
     transform.setRotation(tf_orientation);
     broadcaster_.sendTransform(tf::StampedTransform(
-        transform, ros::Time::now(), "imu_link", "base_link"));
-
-
+        transform, ros::Time::now(), "imu_link", "base_footprint"));
 
     // Prepare Odom MSG
     dogOdom.header.frame_id = "odom";
@@ -227,8 +255,9 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
       // SendHighROS.velocity[2] = angular_z;
       SendHighROS.yawSpeed = angular_z;
 
-      SendHighROS.bodyHeight = 0.1;
-      SendHighROS.footRaiseHeight = 0.1;
+      SendHighROS.bodyHeight = 0.05;
+      std::cout << SendHighROS.bodyHeight << std::endl;
+      SendHighROS.footRaiseHeight = 0.05;
       break;
     case 3:
       motiontime = 0;
@@ -240,7 +269,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
       // SendHighROS.velocity[2] = angular_z;
       SendHighROS.yawSpeed = angular_z;
 
-      SendHighROS.bodyHeight = 0.1;
+      SendHighROS.bodyHeight = body_height;
       SendHighROS.footRaiseHeight = 0.1;
       break;
     case 4:
@@ -273,7 +302,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
         // SendHighROS.velocity[2] = angular_z;
         SendHighROS.yawSpeed = angular_z;
 
-        SendHighROS.bodyHeight = 0.1;
+        SendHighROS.bodyHeight = body_height;
         SendHighROS.footRaiseHeight = 0.1;
       }
       break;
