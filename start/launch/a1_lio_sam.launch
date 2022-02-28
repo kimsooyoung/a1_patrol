@@ -1,5 +1,5 @@
 <launch>
-    <arg name="map_name" default="map_test"/>
+    <arg name="map_name" default="hanyang_startup"/>
 
     <!-- 로봇 개와의 통신 시작 -->
     <node pkg="unitree_legged_real" type="lcm_server_3_2" name="lcm_server_3_2"/>
