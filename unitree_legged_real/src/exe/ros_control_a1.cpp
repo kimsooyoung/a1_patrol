@@ -102,8 +102,9 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
 
   TCmd SendHighLCM = {0};
   TState RecvHighLCM = {0};
-  tf::Quaternion tf_orientation;
+  tf::Quaternion imu_tf_orientation;
   tf::Transform transform;
+  tf::Transform odom_transform;
   unitree_legged_msgs::HighCmd SendHighROS;
   unitree_legged_msgs::HighState RecvHighROS;
 
@@ -156,27 +157,26 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     // new_orientation = q * new_orientation;
 
     // TODO : Check whether xyzw or wxyz
-    tf_orientation[0] = dogImu.orientation.x;
-    tf_orientation[1] = dogImu.orientation.y;
-    tf_orientation[2] = dogImu.orientation.z;
-    tf_orientation[3] = dogImu.orientation.w;
+    imu_tf_orientation[0] = dogImu.orientation.x;
+    imu_tf_orientation[1] = dogImu.orientation.y;
+    imu_tf_orientation[2] = dogImu.orientation.z;
+    imu_tf_orientation[3] = dogImu.orientation.w;
 
-    tf::Matrix3x3 m(tf_orientation);
+    tf::Matrix3x3 m(imu_tf_orientation);
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
 
-    std::cout << roll << " " << pitch << " " << yaw;
+    // std::cout << roll << " " << pitch << " " << yaw;
 
-    transform.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
-    transform.setRotation(tf_orientation);
+    imu_transform.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
+    imu_transform.setRotation(imu_tf_orientation);
     broadcaster_.sendTransform(tf::StampedTransform(
-        transform, ros::Time::now(), "imu_link", "base_link"));
-
-
+        imu_transform, ros::Time::now(), "imu_link", "base_link"));
 
     // Prepare Odom MSG
-    dogOdom.header.frame_id = "odom";
-    dogOdom.child_frame_id = "base_footprint";
+    dogOdom.header.frame_id = "a1_odom";
+    // dogOdom.child_frame_id = "base_footprint";
+    dogOdom.child_frame_id = "base_link";
     dogOdom.header.stamp = ros::Time::now();
 
     dogOdom.pose.pose.position.x = RecvHighROS.position[0];
@@ -186,11 +186,14 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
 
     dogOdom.twist.twist.linear.x = RecvHighROS.velocity[0];
     dogOdom.twist.twist.linear.y = RecvHighROS.velocity[1];
-    // TODO : Check difference btw belows
-    dogOdom.twist.twist.angular.z = RecvHighROS.velocity[2];
-    // dogOdom.twist.twist.angular.z = RecvHighROS.yawSpeed;
+    dogOdom.twist.twist.angular.z = RecvHighROS.yawSpeed;
     dogOdom.twist.covariance.fill(0.0);
     dog_odom_pub.publish(dogOdom);
+
+    odom_transform.setOrigin(tf::Vector3(dogOdom.pose.pose.position.x, dogOdom.pose.pose.position.y, 0.0));
+    odom_transform.setRotation(imu_tf_orientation);
+    broadcaster_.sendTransform(tf::StampedTransform(
+        odom_transform, ros::Time::now(), "a1_odom", "base_link"));
 
     // 리모컨 상태를 판단하기 위해 이전 키 값을 저장합니다.
     last_set_cmd = RecvHighROS.wirelessRemote[3];
