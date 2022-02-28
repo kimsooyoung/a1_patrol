@@ -20,6 +20,9 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include <unitree_legged_msgs/HighCmd.h>
 #include <unitree_legged_msgs/HighState.h>
 
+#include <tf/transform_broadcaster.h>
+#include <tf/transform_datatypes.h>
+
 uint8_t mode = 1;
 uint8_t a1_mode = 1;
 
@@ -73,7 +76,7 @@ void *update_loop(void *param)
 }
 
 // main 함수 template
-template<typename TCmd, typename TState, typename TLCM>
+template <typename TCmd, typename TState, typename TLCM>
 int mainHelper(int argc, char *argv[], TLCM &roslcm)
 {
   std::cout << "WARNING: Control level is set to HIGH-level." << std::endl
@@ -95,9 +98,12 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
   ros::Publisher dog_imu_pub = n.advertise<sensor_msgs::Imu>("/imu_raw", 1000);
   ros::Publisher dog_can_move_pub = n.advertise<std_msgs::Bool>("/dog_can_move", 1000);
   ros::Publisher dog_odom_pub = n.advertise<nav_msgs::Odometry>("/dog_odom", 1000);
+  tf::TransformBroadcaster broadcaster_;
 
   TCmd SendHighLCM = {0};
   TState RecvHighLCM = {0};
+  tf::Quaternion tf_orientation;
+  tf::Transform transform;
   unitree_legged_msgs::HighCmd SendHighROS;
   unitree_legged_msgs::HighState RecvHighROS;
 
@@ -146,6 +152,19 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     dogImu.linear_acceleration.z = RecvHighROS.imu.accelerometer[2];
     // publish dog's imu message
     dog_imu_pub.publish(dogImu);
+
+    // new_orientation = q * new_orientation;
+
+    // TODO : Check whether xyzw or wxyz
+    tf_orientation[0] = dogImu.orientation.x;
+    tf_orientation[1] = dogImu.orientation.y;
+    tf_orientation[2] = dogImu.orientation.z;
+    tf_orientation[3] = dogImu.orientation.w;
+
+    transform.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
+    transform.setRotation(tf_orientation);
+    broadcaster_.sendTransform(tf::StampedTransform(
+        transform, ros::Time::now(), "imu_link", "base_link"));
 
     // Prepare Odom MSG
     dogOdom.header.frame_id = "odom";
@@ -217,22 +236,27 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
       SendHighROS.footRaiseHeight = 0.1;
       break;
     case 4:
-      if (motiontime < 5001){
-        motiontime = motiontime+2;
+      if (motiontime < 5001)
+      {
+        motiontime = motiontime + 2;
         if (motiontime % 10 == 0)
           std::cout << motiontime << std::endl;
       }
 
-      if (motiontime > 0 && motiontime < 2000){
+      if (motiontime > 0 && motiontime < 2000)
+      {
         SendHighROS.mode = 5;
       }
-      if (motiontime > 2000 && motiontime < 4000){
+      if (motiontime > 2000 && motiontime < 4000)
+      {
         SendHighROS.mode = 6;
       }
-      if (motiontime > 4000 && motiontime < 5000){
+      if (motiontime > 4000 && motiontime < 5000)
+      {
         SendHighROS.mode = 0;
       }
-      if (motiontime > 5000) {
+      if (motiontime > 5000)
+      {
         SendHighROS.mode = 2;
         SendHighROS.gaitType = 3;
         SendHighROS.velocity[0] = linear_x;
@@ -284,7 +308,7 @@ int main(int argc, char *argv[])
   else if (strcasecmp(robot_name.c_str(), "Aliengo") == 0)
     rname = UNITREE_LEGGED_SDK::LeggedType::Aliengo;
 
-//   mainHelper();
+  //   mainHelper();
 
   // UNITREE_LEGGED_SDK::InitEnvironment();
   UNITREE_LEGGED_SDK::LCM roslcm(UNITREE_LEGGED_SDK::HIGHLEVEL);
