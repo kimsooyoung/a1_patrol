@@ -1,7 +1,7 @@
 <launch>
-    <node pkg="joy" name="joy_node" type="joy_node">
+    <!-- <node pkg="joy" name="joy_node" type="joy_node">
         <param name="autorepeat_rate" value="100" />
-    </node>
+    </node> -->
 
     <node pkg="unitree_joy_cmd" type="joy_to_cmd_vel_node" name="joy_to_cmd_vel_node"/>
 
