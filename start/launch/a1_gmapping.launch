@@ -16,11 +16,11 @@
     </include>
 
     <!-- 2D SLAM gmapping -->
-    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping_node" output="screen">
+    <!-- Gmapping will be run in Remote PC  -->
+    <!-- <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping_node" output="screen">
         <param name="map_frame" value="map"/>
         <param name="base_frame" value="base_link"/>
-        <!-- <param name="delta" value="0.1"/> -->
         <param name="delta" value="0.05"/>
         <param name="map_file_path" value="$(find start)/maps/gmapping/$(arg map_name)"/>
-    </node>
+    </node> -->
 </launch>
