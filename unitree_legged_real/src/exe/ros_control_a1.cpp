@@ -200,8 +200,8 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
 
     odom_transform.setOrigin(tf::Vector3(dogOdom.pose.pose.position.x, dogOdom.pose.pose.position.y, 0.0));
     odom_transform.setRotation(imu_tf_orientation);
-    // odom_broadcaster_.sendTransform(tf::StampedTransform(
-    //     odom_transform, ros::Time::now(), "a1_odom", "base_link"));
+    odom_broadcaster_.sendTransform(tf::StampedTransform(
+        odom_transform, ros::Time::now(), "odom", "a1_tf"));
 
     // 리모컨 상태를 판단하기 위해 이전 키 값을 저장합니다.
     last_set_cmd = RecvHighROS.wirelessRemote[3];
