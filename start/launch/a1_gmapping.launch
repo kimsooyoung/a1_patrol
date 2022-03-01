@@ -9,13 +9,17 @@
     <!-- base_link to base_foot tf publish -->
     <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 0 0 0 /base_link /base_footprint 100"/>
 
-
     <!-- 위고 메뉴얼과 동일 -->
     <include file="$(find velodyne_pointcloud)/launch/VLP16_points.launch"/>
     <include file="$(find lio_sam)/launch/run.launch">
-        <arg name="map_save_path" value="$(find start)/maps/LOAM/$(arg map_name)/"/>
+        <arg name="map_save_path" value="$(find start)/maps/LOAM/Dummy/"/>
     </include>
 
-    <!-- 3D SLAM lio-sam -->
-
+    <!-- 2D SLAM gmapping -->
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping_node" output="screen">
+        <param name="map_frame" value="map"/>
+        <param name="base_frame" value="base_link"/>
+        <param name="delta" value="0.1"/>
+        <param name="map_file_path" value="$(find start)/maps/gmapping/$(arg map_name)"/>
+    </node>
 </launch>
