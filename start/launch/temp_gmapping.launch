@@ -1,0 +1,16 @@
+<launch>
+    <arg name="map_name" default="hanyang_startup"/>
+
+    <node pkg="unitree_joy_cmd" type="joy_to_cmd_vel_node" name="joy_to_cmd_vel_node"/>
+
+    <!-- 3D SLAM lio-sam -->
+    <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping_node" output="screen">
+        <param name="map_frame" value="map"/>
+        <param name="base_frame" value="base_link"/>
+        <param name="delta" value="0.1"/>
+        <param name="map_file_path" value="$(find start)/maps/gmapping/$(arg map_name)"/>
+    </node>
+
+
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find start)/rviz/gmapping.rviz" />
+</launch>
