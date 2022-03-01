@@ -1,0 +1,12 @@
+<launch>
+    <!-- joy node for remote control -->
+    <!-- <node pkg="joy" name="joy_node" type="joy_node">
+        <param name="autorepeat_rate" value="100" />
+    </node> -->
+
+    <!-- joy node to cmd_vel -->
+    <node pkg="unitree_joy_cmd" type="joy_to_cmd_vel_node" name="joy_to_cmd_vel_node"/>
+
+    <!-- lio_sam rviz -->
+    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find start)/rviz/lio_sam.rviz" />
+</launch>

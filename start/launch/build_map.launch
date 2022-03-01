@@ -9,10 +9,12 @@
     </include>
 
     <!-- base_link to base_foot tf publish -->
+    <!-- static_transform_publisher x y z qx qy qz qw frame_id child_frame_id  period_in_ms -->
     <node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 0 0 0 /base_link /base_footprint 100"/>
 
     <!-- global_map to local_map tf publish -->
     <node pkg="start" type="local_map_tf_publisher" name="local_map_tf_publisher"/>
+
 
     <!-- 2D SLAM gmapping -->
     <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping_node" output="screen">

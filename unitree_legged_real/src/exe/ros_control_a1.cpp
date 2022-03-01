@@ -179,7 +179,7 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     imu_transform.setOrigin(tf::Vector3(0.0, 0.0, 0.0));
     imu_transform.setRotation(imu_tf_orientation);
     broadcaster_.sendTransform(tf::StampedTransform(
-        imu_transform, ros::Time::now(), "imu_link", "base_link"));
+        imu_transform, ros::Time::now(), "chassis_link", "imu_link"));
 
     // Prepare Odom MSG
     dogOdom.header.frame_id = "a1_odom";
