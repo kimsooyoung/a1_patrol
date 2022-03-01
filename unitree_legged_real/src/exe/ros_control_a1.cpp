@@ -182,9 +182,9 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
         imu_transform, ros::Time::now(), "chassis_link", "imu_link"));
 
     // Prepare Odom MSG
-    dogOdom.header.frame_id = "a1_odom";
+    dogOdom.header.frame_id = "odom";
     // dogOdom.child_frame_id = "base_footprint";
-    dogOdom.child_frame_id = "base_link";
+    dogOdom.child_frame_id = "a1_tf";
     dogOdom.header.stamp = ros::Time::now();
 
     dogOdom.pose.pose.position.x = RecvHighROS.position[0];
