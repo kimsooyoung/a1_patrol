@@ -26,7 +26,7 @@ unitree_legged_msgs::Cartesian ToRos(UNITREE_LEGGED_SDK::Cartesian &lcm) {
   return ros;
 }
 
-unitree_legged_msgs::BmsCmd ToLcm(unitree_legged_msgs::BmsCmd &ros,
+UNITREE_LEGGED_SDK::BmsCmd ToLcm(unitree_legged_msgs::BmsCmd &ros,
                                    UNITREE_LEGGED_SDK::BmsCmd lcmType) {
   UNITREE_LEGGED_SDK::BmsCmd lcm;
   lcm.off = ros.off;
@@ -190,7 +190,7 @@ unitree_legged_msgs::HighState ToRos(UNITREE_LEGGED_SDK::HighState &lcm) {
   for (int i = 0; i < 20; i++) {
     ros.motorState[i] = ToRos(lcm.motorState[i]);
   }
-  ros.bms = ToRos(ros.bms);
+  ros.bms = ToRos(lcm.bms);
 
   ros.mode = lcm.mode;
   ros.progress = lcm.progress;
@@ -254,7 +254,7 @@ UNITREE_LEGGED_SDK::HighCmd ToLcm(unitree_legged_msgs::HighCmd &ros,
   }
 
   lcm.yawSpeed = ros.yawSpeed;
-  lcm.bms = ToRos(ros.bms);
+  lcm.bms = ToLcm(ros.bms, lcm.bms);
 
   for (int i = 0; i < 4; i++) {
     lcm.led[i].r = ros.led[i].r;
