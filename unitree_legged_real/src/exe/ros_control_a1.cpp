@@ -12,13 +12,18 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 
 #include <chrono>
 #include <thread>
+
 #include <std_msgs/Bool.h>
 #include <std_msgs/UInt8.h>
+#include <std_msgs/Float32MultiArray.h>
+
 #include <sensor_msgs/Imu.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Twist.h>
+
 #include <unitree_legged_msgs/HighCmd.h>
 #include <unitree_legged_msgs/HighState.h>
+#include <unitree_legged_msgs/BmsState.h>
 
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_datatypes.h>
@@ -95,9 +100,13 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
   ros::Subscriber cmd_vel_sub = n.subscribe("/cmd_vel", 1, cmd_vel_cb);
   ros::Subscriber mode_sub = n.subscribe("/dog_mode", 1, mode_cb);
   ros::Subscriber a1_mode_sub = n.subscribe("/a1_mode", 1, a1_mode_cb);
+
   ros::Publisher dog_imu_pub = n.advertise<sensor_msgs::Imu>("/imu_raw", 1000);
   ros::Publisher dog_can_move_pub = n.advertise<std_msgs::Bool>("/dog_can_move", 1000);
   ros::Publisher dog_odom_pub = n.advertise<nav_msgs::Odometry>("/dog_odom", 1000);
+  ros::Publisher bms_state_pub = n.advertise<unitree_legged_msgs::BmsState>("/bms_state", 1000);
+  ros::Publisher range_obstacle_pub = n.advertise<std_msgs::Float32MultiArray>("/range_obstacle", 1000);
+
   tf::TransformBroadcaster broadcaster_;
   tf::TransformBroadcaster odom_broadcaster_;
 
@@ -108,6 +117,8 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
   tf::Transform odom_transform;
   unitree_legged_msgs::HighCmd SendHighROS;
   unitree_legged_msgs::HighState RecvHighROS;
+  unitree_legged_msgs::BmsState bms_state;
+  std_msgs::Float32MultiArray range_obstacle;
 
   roslcm.SubscribeState();
 
@@ -202,6 +213,13 @@ int mainHelper(int argc, char *argv[], TLCM &roslcm)
     odom_transform.setRotation(imu_tf_orientation);
     odom_broadcaster_.sendTransform(tf::StampedTransform(
         odom_transform, ros::Time::now(), "odom", "a1_tf"));
+
+    // 각종 베터리 상태를 확인할 수 있는 bms status publish
+    bms_state = RecvHighROS.bms;
+    bms_state_pub.publish(bms_state);
+
+    range_obstacle = RecvHighROS.rangeObstacle;
+    range_obstacle_pub.publish(range_obstacle);
 
     // 리모컨 상태를 판단하기 위해 이전 키 값을 저장합니다.
     last_set_cmd = RecvHighROS.wirelessRemote[3];
