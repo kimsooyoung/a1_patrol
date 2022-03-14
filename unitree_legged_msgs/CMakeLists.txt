@@ -10,16 +10,17 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_message_files(
   FILES
-  Go1/BmsState.msg
-  Go1/MotorCmd.msg
-  Go1/MotorState.msg
-  Go1/Cartesian.msg
-  Go1/IMU.msg
-  Go1/LED.msg
-  Go1/LowCmd.msg
-  Go1/LowState.msg
-  Go1/HighCmd.msg
-  Go1/HighState.msg
+  BmsState.msg
+  BmsCmd.msg
+  MotorCmd.msg
+  MotorState.msg
+  Cartesian.msg
+  IMU.msg
+  LED.msg
+  LowCmd.msg
+  LowState.msg
+  HighCmd.msg
+  HighState.msg
 )
 
 generate_messages(
