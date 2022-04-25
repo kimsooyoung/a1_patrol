@@ -75,5 +75,5 @@ rostopic echo /imu_raw => check imu sub
 
 ```
 roslaunch unitree_legged_real real.launch
-
+roslaunch start joy_control.launch
 ```
