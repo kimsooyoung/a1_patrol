@@ -6,14 +6,14 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #ifndef _CONVERT_H_
 #define _CONVERT_H_
 
-#include "unitree_legged_sdk/unitree_legged_sdk.h"
-#include <unitree_legged_msgs/HighCmd.h>
-#include <unitree_legged_msgs/HighState.h>
-#include <unitree_legged_msgs/IMU.h>
 #include <unitree_legged_msgs/LowCmd.h>
 #include <unitree_legged_msgs/LowState.h>
+#include <unitree_legged_msgs/HighCmd.h>
+#include <unitree_legged_msgs/HighState.h>
 #include <unitree_legged_msgs/MotorCmd.h>
 #include <unitree_legged_msgs/MotorState.h>
+#include <unitree_legged_msgs/IMU.h>
+#include "unitree_legged_sdk/unitree_legged_sdk.h"
 
 unitree_legged_msgs::Cartesian ToRos(UNITREE_LEGGED_SDK::Cartesian &lcm) {
   unitree_legged_msgs::Cartesian ros;
