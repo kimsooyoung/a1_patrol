@@ -45,10 +45,12 @@ alias rosdinstall='rosdep install -y -r -q --from-paths src --ignore-src --rosdi
 ```
 
 
+Build
+
 ```
-remote: Invalid username or password.
-
-
+cop unitree_legged_msgs && sds
+cop unitree_legged_real && sds
+cop unitree_joy_cmd && sds
 ```
 
 시작하기
