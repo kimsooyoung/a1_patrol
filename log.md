@@ -23,6 +23,9 @@ clone legged_sdk & build
 bashrc utils
 
 ```
+export ROS_MASTER_URI=http://localhost:11311
+export ROS_HOSTNAME=127.0.0.1
+
 alias eb='gedit ~/.bashrc'
 alias sb='source ~/.bashrc'
 
@@ -45,10 +48,7 @@ alias rosdinstall='rosdep install -y -r -q --from-paths src --ignore-src --rosdi
 ```
 remote: Invalid username or password.
 
-git remote remove origin
-git remote add origin https://kimsooyoung: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@github.com/kimsooyoung/a1_patrol.git/
 
-git push --set-upstream origin main
 ```
 
 시작하기
@@ -61,3 +61,17 @@ git push --set-upstream origin main
 부팅 => (L1 + start)
 
 L2 + A 하고 나서 L2 + Start로 ROS 제어 진입할 수 있는데 이때 조이스틱 왼쪽이 중립을 잘 유지해야 바뀐다.
+
+```
+ifsetup 192.168.123.12
+
+roslaunch unitree_legged_real real.launch
+rosrun unitree_legged_real ros_control_helper
+
+rostopic echo /imu_raw => check imu sub
+```
+
+```
+roslaunch unitree_legged_real real.launch
+
+```
