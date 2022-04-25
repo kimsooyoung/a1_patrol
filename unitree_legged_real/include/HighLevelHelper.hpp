@@ -23,7 +23,7 @@
 #include <boost/thread/mutex.hpp>
 #include <unitree_legged_msgs/HighCmd.h>
 #include <unitree_legged_msgs/HighState.h>
-#include <unitree_legged_msgs/BmsState.h>
+// #include <unitree_legged_msgs/BmsState.h>
 #include "convert.h"
 
 using namespace UNITREE_LEGGED_SDK;
