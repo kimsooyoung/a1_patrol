@@ -1,0 +1,19 @@
+<launch>
+
+  <node pkg="unitree_legged_real" name="ros_control_helper" type="ros_control_helper" output="screen" >
+    <param name="imu_link" type="str" value="imu_link" />
+    <param name="base_link" type="str" value="base_link" />
+    <param name="odom_link" type="str" value="odom" />
+
+    <param name="publish_tf" type="bool" value="true" />
+    <param name="verbose" type="bool" value="false" />
+  </node>
+
+  <node pkg="unitree_twist_cmd" name="unitree_twist_cmd" type="unitree_twist_cmd" output="screen">
+    <param name="default_mode" type="int" value="1" />
+    
+    <param name="verbose" type="bool" value="true" />
+  </node>
+
+  <node name="robot2cam" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 1 /base_link /camera_link 100"/>
+</launch>

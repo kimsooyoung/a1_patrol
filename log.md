@@ -126,3 +126,30 @@ rostopic echo /imu_raw => check imu sub
 roslaunch unitree_legged_real real.launch
 roslaunch start joy_control.launch
 ```
+
+```
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+
+started roslaunch server http://192.168.0.4:43885/
+ros_comm version 1.14.10
+
+
+SUMMARY
+========
+
+PARAMETERS
+ * /rosdistro: melodic
+ * /rosversion: 1.14.10
+
+NODES
+
+auto-starting new master
+process[master]: started with pid [12597]
+ROS_MASTER_URI=http://192.168.0.4:11311/
+
+setting /run_id to 70fe5b32-c581-11ec-a91b-48b02d078d9b
+process[rosout-1]: started with pid [12608]
+started core service [/rosout]
+
+```
