@@ -20,6 +20,13 @@ cd /home/unitree/Unitree/sdk
 clone legged_sdk & build
 ```
 
+SLAMWare SDK
+
+```
+slamware_ros_sdk & slamware_sdk => catkin_ws 안에 두고 빌드
+slam_planner & slam_planner_sdk => 포함
+```
+
 bashrc utils
 
 ```
