@@ -23,11 +23,46 @@ clone legged_sdk & build
 SLAMWare SDK
 
 ```
+sudo apt-get install build-essential gcc make cmake cmake-gui cmake-curses-gui
+sudo apt-get install libssl-dev 
+sudo apt-get install doxygen graphviz
+
 slamware_ros_sdk & slamware_sdk => catkin_ws 안에 두고 빌드
 slam_planner & slam_planner_sdk => 포함
 
 cop slamware_ros_sdk && sds
 cop slam_planner && sds
+```
+
+realsense
+
+```
+sudo apt-get install ros-melodic-realsense2-camera -y
+sudo apt install ros-melodic-ddynamic-reconfigure -y
+
+# librealsense
+https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md#installing-the-packages
+
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE
+sudo add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo $(lsb_release -cs) main" -u
+sudo apt-get install librealsense2-dkms
+sudo apt-get install librealsense2-utils
+
+Reconnect the Intel RealSense depth camera and run: realsense-viewer to verify the installation.
+
+confirm connection with realsense-viewer 
+[picture]
+
+# realsense-ros
+
+cd realsense_ws
+catkin_make clean
+catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release
+catkin_make install
+
+roslaunch realsense2_camera rs_camera.launch
+roslaunch realsense2_camera rs_camera.launch filters:=pointcloud
+[picture]
 ```
 
 bashrc utils
