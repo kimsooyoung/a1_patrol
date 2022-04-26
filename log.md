@@ -60,6 +60,10 @@ catkin_make clean
 catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release
 catkin_make install
 
+cop realsense2_description -DCMAKE_BUILD_TYPE=Release
+cop realsense2_camera -DCMAKE_BUILD_TYPE=Release
+catkin_make install
+
 roslaunch realsense2_camera rs_camera.launch
 roslaunch realsense2_camera rs_camera.launch filters:=pointcloud
 [picture]
