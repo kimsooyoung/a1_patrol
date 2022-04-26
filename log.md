@@ -25,6 +25,9 @@ SLAMWare SDK
 ```
 slamware_ros_sdk & slamware_sdk => catkin_ws 안에 두고 빌드
 slam_planner & slam_planner_sdk => 포함
+
+cop slamware_ros_sdk && sds
+cop slam_planner && sds
 ```
 
 bashrc utils

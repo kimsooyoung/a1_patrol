@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>slam_planner_sdk</name>
+  <version>2.6.7</version>
+  <description>The slam_planner_sdk package</description>
+
+  <maintainer email="dengzhi@zju.edu.cn"> slam_planner_sdk </maintainer>
+  <license>BSD</license>
+  <url type="website">https://blog.csdn.net/qq_29797957?spm=1011.2124.3001.5343</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
