@@ -125,19 +125,19 @@ target_include_directories(slam_planner_node
 #)
 ##
 ######################################### App Interface ###########################################################
-add_executable(mapMessage_node src/app_mapMessages.cpp)
-target_link_libraries(mapMessage_node
-	${catkin_LIBRARIES}
-	# 	app_message
-	${SLTC_SDK_LIB_DIR}/libapp_message.so
-)
+# add_executable(mapMessage_node src/app_mapMessages.cpp)
+# target_link_libraries(mapMessage_node
+# 	${catkin_LIBRARIES}
+# 	# 	app_message
+# 	${SLTC_SDK_LIB_DIR}/libapp_message.so
+# )
 
-add_executable(mqttControl_node src/app_mqttControler.cpp)
-target_link_libraries(mqttControl_node
-	${catkin_LIBRARIES}
-	#app_message
-	${SLTC_SDK_LIB_DIR}/libapp_message.so
-)
+# add_executable(mqttControl_node src/app_mqttControler.cpp)
+# target_link_libraries(mqttControl_node
+# 	${catkin_LIBRARIES}
+# 	#app_message
+# 	${SLTC_SDK_LIB_DIR}/libapp_message.so
+# )
 
 add_executable(slamwalk_node src/slamwalk_node.cpp)
 target_link_libraries(slamwalk_node
