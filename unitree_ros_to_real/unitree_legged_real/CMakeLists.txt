@@ -56,6 +56,9 @@ add_executable(ros_control_helper src/exe/ros_control_helper.cpp )
 target_link_libraries(ros_control_helper ${EXTRA_LIBS} ${catkin_LIBRARIES})
 add_dependencies(ros_control_helper ${${PEOJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+# User custom localtion required
+# add_executable(lcm_server_3_2 /home/kimsooyoung/Downloads/unitree_legged_sdk/examples/lcm_server_high.cpp)
+
 add_executable(lcm_server_3_2 /home/unitree/Unitree/sdk/unitree_legged_sdk/examples/lcm_server_high.cpp)
 target_link_libraries(lcm_server_3_2 ${EXTRA_LIBS} ${catkin_LIBRARIES})
 add_dependencies(lcm_server_3_2 ${${PEOJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

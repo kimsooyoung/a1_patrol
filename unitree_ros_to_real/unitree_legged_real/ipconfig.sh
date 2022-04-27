@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# sudo ifconfig lo multicast
-# sudo route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
+# ex) lan port id was enx00e04c360310
 
-# sudo ifconfig enp2s0 down
-# sudo ifconfig enp2s0 up 192.168.123.162 netmask 255.255.255.0
-
-sudo ifconfig eth0 down
-sudo ifconfig eth0 192.168.123.162/24
-sudo ifconfig eth0 up
+sudo ifconfig enx00e04c360310 down
+sudo ifconfig enx00e04c360310 192.168.123.162/24
+sudo ifconfig enx00e04c360310 up

@@ -100,6 +100,7 @@ Build
 cop unitree_legged_msgs && sds
 cop unitree_legged_real && sds
 cop unitree_joy_cmd && sds
+cop unitree_twist_cmd && sds
 ```
 
 시작하기
