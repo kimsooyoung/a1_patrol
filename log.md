@@ -153,3 +153,20 @@ process[rosout-1]: started with pid [12608]
 started core service [/rosout]
 
 ```
+
+
+```lcm_server_high.cpp
+void Custom::LCMRecv()
+{
+    if(mylcm.highCmdLCMHandler.isrunning){
+        pthread_mutex_lock(&mylcm.highCmdLCMHandler.countMut);
+        mylcm.highCmdLCMHandler.counter++;
+        if(mylcm.highCmdLCMHandler.counter > 1000){
+            printf("Error! LCM Time out.\n");
+            exit(-1);              // can be commented out
+        }
+        pthread_mutex_unlock(&mylcm.highCmdLCMHandler.countMut);
+    }
+    mylcm.Recv();
+}
+```

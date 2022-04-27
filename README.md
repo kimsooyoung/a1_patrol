@@ -31,24 +31,9 @@ rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 
 roslaunch realsense2_camera rs_camera.launch
 rosbag record -a -o a1_realsense_hanyang
-
 ```
 
-```lcm_server_high.cpp
-void Custom::LCMRecv()
-{
-    if(mylcm.highCmdLCMHandler.isrunning){
-        pthread_mutex_lock(&mylcm.highCmdLCMHandler.countMut);
-        mylcm.highCmdLCMHandler.counter++;
-        if(mylcm.highCmdLCMHandler.counter > 1000){
-            printf("Error! LCM Time out.\n");
-            exit(-1);              // can be commented out
-        }
-        pthread_mutex_unlock(&mylcm.highCmdLCMHandler.countMut);
-    }
-    mylcm.Recv();
-}
-```
+
 
 [] 2D lidar compile && check
 [] Realsense check && example coding
