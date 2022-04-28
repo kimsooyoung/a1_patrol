@@ -33,6 +33,11 @@ roslaunch realsense2_camera rs_camera.launch
 rosbag record -a -o a1_realsense_hanyang
 ```
 
+```
+roslaunch slam_planner slam_rplidar_start.launch
+rostopic pub /slamware_ros_sdk_server_node/clear_map slamware_ros_sdk/ClearMapRequest "kind:
+ kind: 0"
+```
 
 
 [] 2D lidar compile && check
