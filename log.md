@@ -1,14 +1,14 @@
 # Installation
 
 ```
-sudo apt-get install python-pip
-sudo pip install -U rosdep
+sudo apt-get install python-pip -y
+sudo pip install -U rosdep -y
 
 cd a1_patrol
 sudo rosdep init
 rosdep update
 
-sudo apt install ros-melodic-joy
+sudo apt install ros-melodic-joy -y
 
 ```
 
@@ -23,15 +23,29 @@ clone legged_sdk & build
 SLAMWare SDK
 
 ```
-sudo apt-get install build-essential gcc make cmake cmake-gui cmake-curses-gui
-sudo apt-get install libssl-dev 
-sudo apt-get install doxygen graphviz
+sudo apt-get install build-essential gcc make cmake cmake-gui cmake-curses-gui -y
+sudo apt-get install libssl-dev -y 
+sudo apt-get install doxygen graphviz -y
 
 slamware_ros_sdk & slamware_sdk => catkin_ws 안에 두고 빌드
 slam_planner & slam_planner_sdk => 포함
 
+cop slamware_sdk && sds
 cop slamware_ros_sdk && sds
-cop slam_planner && sds
+cop slam_planner && sds => TODO
+```
+
+msgpack Issue 
+
+```
+sudo apt install libmsgpack-dev
+```
+
+GPP Key Issue
+
+```
+sudo apt-key del  F42ED6FBAB17C654
+sudo -E apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 ```
 
 realsense
@@ -69,6 +83,8 @@ roslaunch realsense2_camera rs_camera.launch filters:=pointcloud
 [picture]
 ```
 
+std::find_if Error => https://github.com/IntelRealSense/realsense-ros/issues/910#issuecomment-1062554386
+
 bashrc utils
 
 ```
@@ -97,6 +113,10 @@ alias rosdinstall='rosdep install -y -r -q --from-paths src --ignore-src --rosdi
 Build
 
 ```
+sudo apt install ros-melodic-controller-manager* -y
+sudo apt install ros-melodic-teleop-twist-keyboard -y
+sudo apt install ros-melodic-teleop-joy -y
+
 cop unitree_legged_msgs && sds
 cop unitree_legged_real && sds
 cop unitree_joy_cmd && sds
