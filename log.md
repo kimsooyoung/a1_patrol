@@ -191,3 +191,6 @@ void Custom::LCMRecv()
     mylcm.Recv();
 }
 ```
+
+# outdoor setup
+
