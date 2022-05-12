@@ -10,7 +10,11 @@ project(start)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     std_srvs
+    tf
     tf2_ros
+    sensor_msgs
+    laser_geometry
+    message_filters
     message_generation
     actionlib
     move_base_msgs
@@ -139,8 +143,13 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collides
 add_executable(patrol src/patrol.cpp)
 target_link_libraries(patrol ${catkin_LIBRARIES})
+
 add_executable(local_map_tf_publisher src/local_map_tf_publisher.cpp)
 target_link_libraries(local_map_tf_publisher ${catkin_LIBRARIES})
+
+add_executable(laserscan_to_pointcloud src/laserscan_to_pointcloud.cpp)
+target_link_libraries(laserscan_to_pointcloud ${catkin_LIBRARIES})
+
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
