@@ -1,0 +1,21 @@
+<launch>
+
+  <include file="$(find slam_planner)/launch/slam_rplidar_start.launch"/>
+
+  <node pkg="slam_planner" type="slam_planner_node" respawn="false" name="slam_planner_node" output="screen" clear_params="true"> 
+    <rosparam file="$(find slam_planner)/params/costmap_common_params.yaml"       command="load"  ns="global_costmap" />
+    <rosparam file="$(find slam_planner)/params/costmap_common_params.yaml"       command="load"  ns="local_costmap" />
+    <rosparam file="$(find slam_planner)/params/local_costmap_params.yaml"        command="load" />
+    <rosparam file="$(find slam_planner)/params/global_costmap_params.yaml"       command="load" />
+    <rosparam file="$(find slam_planner)/params/base_local_planner_params.yaml"   command="load" />
+    <rosparam file="$(find slam_planner)/params/nav_obstacles_params.yaml"             command="load" />
+  </node>
+  
+  
+  <!--<node name="map_server" pkg="map_server" type="map_server" args="$(find slam_planner)/maps/map100.yaml"/>-->
+  <!--<node pkg="tf" type="static_transform_publisher" name="odom_map_broadcaster" args="0 0 0 0 0 0 /map /odom 100" /> -->
+  
+  
+  <node pkg="slam_planner" type="base_controller_node" name="base_controller_node"/>
+  <!--<node pkg="rviz"  type="rviz"  name="rviz" args="-d $(find slam_planner)/cfg/slam_planner_test.rviz" />-->
+</launch>

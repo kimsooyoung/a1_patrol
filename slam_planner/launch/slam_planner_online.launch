@@ -1,0 +1,22 @@
+<launch>
+  <include file="$(find slam_planner)/launch/slam_rplidar_start.launch" />
+
+  <node pkg="slam_planner" type="slam_planner_node" respawn="false" name="slam_planner_node" output="screen" clear_params="true">
+    <rosparam file="$(find improved_local_planner)/params/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find improved_local_planner)/params/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find improved_local_planner)/params/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find improved_local_planner)/params/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find improved_local_planner)/params/DBlocal_planner_params.yaml" command="load" />
+
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+    <param name="planner_frequency" value="1.0" />
+    <param name="planner_patience" value="5.0" />
+    <param name="base_local_planner" value="improved_local_planner/DBLocalPlannerROS" />
+    <param name="controller_frequency" value="5.0" />
+    <param name="controller_patience" value="15.0" />
+  </node>
+  <!--node pkg="rviz"  type="rviz"  name="rviz" args="-d $(find slam_planner)/cfg/slam_planner_online.rviz" required="true"/-->
+  <!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find improved_local_planner)/cfg/slam_newplanner_test.rviz"/-->
+  <!-- <node pkg="slam_planner" type="mapMessage_node" name="mapMessage_node" /> -->
+  <!-- <node pkg="slam_planner" type="mqttControl_node" name="mqttControl_node" /> -->
+</launch>
