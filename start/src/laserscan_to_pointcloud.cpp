@@ -1,68 +1,53 @@
-#include <ros/ros.h>
+#include <iostream>
+#include <fstream>
+#include <chrono>
+#include <algorithm>
+#include <iterator>
+
+#include <pcl/point_types.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/transforms.h>
+
+#include <ros/ros.h>
+#include <pcl_ros/point_cloud.h>
 #include <laser_geometry/laser_geometry.h>
 
 
-class LaserScanToPointCloud{
+using namespace std;
 
-private:
-    ros::NodeHandle n_;
+ros::Publisher pcl_from_scan;
 
-    laser_geometry::LaserProjection projector_;
+typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
+laser_geometry::LaserProjection projector;
 
-    ros::Publisher pcl_pub_;
-    ros::Subscriber laserscan_sub_;
+void hokuyo_callbacks(const sensor_msgs::LaserScan::ConstPtr& scan_in)
+{
+    sensor_msgs::PointCloud2 cloud;
+    projector.projectLaser(*scan_in, cloud);
+
+    // Publish the new point cloud.
+    cloud.header.frame_id = "/pcl_laser";
+    cloud.header.seq = scan_in->header.seq;
+    cloud.header.stamp = scan_in->header.stamp;
+    pcl_from_scan.publish(cloud);
+}
+
+int main(int argc, char **argv) {
+    ros::init(argc, argv, "laserScan_to_pointcloud");
+    ros::NodeHandle nh;
+
+    ros::Subscriber hokuyo_sub;
+    hokuyo_sub = nh.subscribe<sensor_msgs::LaserScan>("/scan", 1, hokuyo_callbacks);
+
     
-public:
-    LaserScanToPointCloud(ros::NodeHandle n) : n_(n){
+    pcl_from_scan = nh.advertise<PointCloud>("hokuyo_points", 1);
 
-        pcl_pub_ = n_.advertise<sensor_msgs::PointCloud2>("/my_cloud", 1);
-        laserscan_sub_ = n_.subscribe("/scan", 1, &LaserScanToPointCloud::subCallback, this);
-
-        ROS_INFO("my_scan_to_cloud node started");
+    while (ros::ok())
+    {
+        ros::spin();
     }
 
-    void subCallback(const sensor_msgs::LaserScan::ConstPtr &scan_in){
-        sensor_msgs::PointCloud2 cloud;
-
-        std::cout<< "sdfd" << std::endl;
-
-        try{
-            projector_.projectLaser(*scan_in,cloud);
-            cloud.header = scan_in->header;
-            cloud.header.frame_id = "pointcloud_lidar";
-        }
-        catch (tf::TransformException& e){
-            std::cout << e.what();
-            return;
-        }
-    
-        pcl_pub_.publish(cloud);
-
-        // for(unsigned int i=0; i<cloud.fields.size(); i++)
-        //     {cloud.fields[i].count = 1;}
-    
-        // if (::frame_count==0){
-        //     wall=cloud;	
-        //     scan_pub_.publish(wall); //save 1st pointcloud as wall sensor_msg
-        //     ROS_INFO("published wall");
-        // }
-        // else{
-        //     scan_pub_.publish(cloud);
-        //     //ROS_INFO("published frame %f ",::frame_count);
-        // }
-        // ::frame_count++;
-    }
-
-};
-
-int main(int argc, char **argv){
-
-    ros::init(argc, argv, "scan_to_point_cloud");
-    ros::NodeHandle n;
-    LaserScanToPointCloud lstopc(n);
-
-    ros::spin();
-
+    nh.shutdown();          
     return 0;
 }

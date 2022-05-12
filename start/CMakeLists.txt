@@ -7,6 +7,8 @@ project(start)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+find_package( PCL REQUIRED )
+
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     std_srvs
@@ -126,6 +128,7 @@ catkin_package(
 include_directories(
 # include
     ${catkin_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -148,7 +151,7 @@ add_executable(local_map_tf_publisher src/local_map_tf_publisher.cpp)
 target_link_libraries(local_map_tf_publisher ${catkin_LIBRARIES})
 
 add_executable(laserscan_to_pointcloud src/laserscan_to_pointcloud.cpp)
-target_link_libraries(laserscan_to_pointcloud ${catkin_LIBRARIES})
+target_link_libraries(laserscan_to_pointcloud ${catkin_LIBRARIES} ${PCL_LIBRARY_DIRS})
 
 
 ## Rename C++ executable without prefix

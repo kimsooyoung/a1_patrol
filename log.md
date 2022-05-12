@@ -194,3 +194,25 @@ void Custom::LCMRecv()
 
 # outdoor setup
 
+# terminal 1 - ssh (real)
+roslaunch unitree_legged_real real.launch
+
+# terminal 2 - ssh (joy)
+roslaunch start joy_control.launch
+
+# terminal 3 - ssh (realsense + static tf)
+roslaunch start rs_with_resolution.launch 
+
+# terminal 4 - ssh (lidar + static tf)
+roslaunch start slam_rplidar_start.launch 
+
+# terminal 5 - remote view (rviz)
+rviz
+
+# terminal 6 - remote rosbag record
+rosbag record -a -o trans_log
+
+# recording example
+rosbag record -o retest_5 /tf /tf_static /dog_odom /imu_raw /scan /camera/color/image_raw /camera/depth/image_rect_raw 
+
+roslaunch start view_pointcloud.launch
